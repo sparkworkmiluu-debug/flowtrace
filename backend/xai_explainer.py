@@ -335,7 +335,11 @@ Return strictly valid JSON conforming to the requested schema. Never output mark
                 from google import genai
                 from google.genai import types
 
-                client = genai.Client(api_key=api_key)
+                # 2000ms strict HTTP timeout
+                client = genai.Client(
+                    api_key=api_key,
+                    http_options=types.HttpOptions(timeout=2000)
+                )
                 for model_name in ["gemini-2.5-flash", "gemini-3.8-flash"]:
                     try:
                         response = client.models.generate_content(
@@ -358,15 +362,13 @@ Return strictly valid JSON conforming to the requested schema. Never output mark
             except Exception:
                 return None
 
-        # Execute with strict timeout
-        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-            future = executor.submit(_call_gemini_api)
-            try:
-                res = future.result(timeout=timeout_seconds)
-                if res is not None:
-                    return res
-            except Exception:
-                pass
+        # Try API with timeout fallback
+        try:
+            res = _call_gemini_api()
+            if res is not None:
+                return res
+        except Exception:
+            pass
 
         return self.generate_deterministic_narrative(
             masked_entity, risk_score, top_contributions, motifs

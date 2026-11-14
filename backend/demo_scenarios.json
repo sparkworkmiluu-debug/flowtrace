@@ -1,0 +1,341 @@
+[
+  {
+    "id": "scenario_cycle_laundering",
+    "name": "Circular Layering Ring (3-Hop Cycle)",
+    "category": "Money Laundering",
+    "flow_type": "cycle",
+    "is_laundering": true,
+    "baseline_alert": true,
+    "flowtrace_alert": true,
+    "risk_score": 94.5,
+    "target_account": "BANK000_****D1A0",
+    "nodes": [
+      {
+        "id": "BANK000_****D1A0",
+        "label": "Ring Node 1 (Origin/Hop)",
+        "type": "ring_origin",
+        "pagerank": 0.00042
+      },
+      {
+        "id": "BANK01595_****1FD0",
+        "label": "Ring Node 2 (Intermediary Hop)",
+        "type": "ring_hop",
+        "pagerank": 0.00038
+      },
+      {
+        "id": "BANK023848_****BC80",
+        "label": "Ring Node 3 (Intermediary Hop)",
+        "type": "ring_hop",
+        "pagerank": 0.00038
+      }
+    ],
+    "edges": [
+      {
+        "source": "BANK000_****D1A0",
+        "target": "BANK01595_****1FD0",
+        "amount": 1547.24,
+        "timestamp": "2022-09-02 08:14:00",
+        "payment_format": "Credit Card",
+        "is_laundering": true
+      },
+      {
+        "source": "BANK01595_****1FD0",
+        "target": "BANK023848_****BC80",
+        "amount": 1547.24,
+        "timestamp": "2022-09-02 09:30:00",
+        "payment_format": "Credit Card",
+        "is_laundering": true
+      },
+      {
+        "source": "BANK023848_****BC80",
+        "target": "BANK000_****D1A0",
+        "amount": 1547.24,
+        "timestamp": "2022-09-02 11:45:00",
+        "payment_format": "Credit Card",
+        "is_laundering": true
+      }
+    ],
+    "shap_breakdown": [
+      {
+        "feature": "fmt_ach",
+        "label": "ACH Electronic Settlement",
+        "value": 1.0,
+        "shap_value": 2.4453234672546387,
+        "direction": "increases_risk"
+      },
+      {
+        "feature": "pagerank_ratio",
+        "label": "Network Centrality Asymmetry Ratio",
+        "value": 0.0,
+        "shap_value": 1.0570703744888306,
+        "direction": "increases_risk"
+      },
+      {
+        "feature": "dst_fan_in",
+        "label": "Destination Fan-In",
+        "value": 0.0,
+        "shap_value": -1.0506367683410645,
+        "direction": "decreases_risk"
+      },
+      {
+        "feature": "dst_in_degree",
+        "label": "Destination In-Degree",
+        "value": 0.0,
+        "shap_value": 0.8298537731170654,
+        "direction": "increases_risk"
+      },
+      {
+        "feature": "src_out_degree",
+        "label": "Origin Out-Degree (Total Transfers)",
+        "value": 3.0,
+        "shap_value": 0.808089554309845,
+        "direction": "increases_risk"
+      }
+    ],
+    "xai_explanation": {
+      "summary": "FlowTrace flagged entity BANK000_****D1A0 with 94.5/100 Risk Score due to confirmed circular fund layering. Network topology exhibits high reciprocal connectivity characteristic of an organized laundering ring.",
+      "risk_level": "CRITICAL",
+      "confidence_score": 0.945,
+      "key_drivers": [
+        "ACH Electronic Settlement (value=1.00, elevating risk by 2.445 log-odds)",
+        "Network Centrality Asymmetry Ratio (value=0.00, elevating risk by 1.057 log-odds)",
+        "Destination Fan-In (value=0.00, mitigating risk by 1.051 log-odds)"
+      ],
+      "graph_motif_analysis": "Entity BANK000_****D1A0 is embedded in a closed circular transaction loop (3-hop laundering cycle). Funds circulate back to origin banks with negligible economic rationale, indicating synthetic layering.",
+      "recommended_action": "IMMEDIATE ESCALATION: Freeze connected intermediary nodes and file FinCEN Suspicious Activity Report (SAR)."
+    },
+    "roi_savings": {
+      "analyst_hours_saved": 0.0,
+      "cost_savings_usd": 0.0,
+      "alert_type": "True Positive Laundering Ring"
+    }
+  },
+  {
+    "id": "scenario_gather_scatter",
+    "name": "Gather-Scatter Smurfing Network",
+    "category": "Money Laundering",
+    "flow_type": "gather_scatter",
+    "is_laundering": true,
+    "baseline_alert": true,
+    "flowtrace_alert": true,
+    "risk_score": 88.2,
+    "target_account": "BANK011_****B960",
+    "nodes": [
+      {
+        "id": "BANK011_****B960",
+        "label": "Central Smurfing Hub",
+        "type": "hub_aggregator",
+        "pagerank": 0.00185
+      },
+      {
+        "id": "BANK020_****3210",
+        "label": "Inbound Smurf Feeder A",
+        "type": "smurf_feeder",
+        "pagerank": 0.00015
+      },
+      {
+        "id": "BANK01595_****83C0",
+        "label": "Inbound Smurf Feeder B",
+        "type": "smurf_feeder",
+        "pagerank": 0.00018
+      },
+      {
+        "id": "BANK0224_****7B30",
+        "label": "Outbound Dispersal Mule 1",
+        "type": "dispersal_target",
+        "pagerank": 0.00022
+      },
+      {
+        "id": "BANK025400_****F420",
+        "label": "Outbound Dispersal Mule 2",
+        "type": "dispersal_target",
+        "pagerank": 0.00025
+      }
+    ],
+    "edges": [
+      {
+        "source": "BANK020_****3210",
+        "target": "BANK011_****B960",
+        "amount": 9850.0,
+        "timestamp": "2022-09-03 14:10:00",
+        "payment_format": "Cash",
+        "is_laundering": true
+      },
+      {
+        "source": "BANK01595_****83C0",
+        "target": "BANK011_****B960",
+        "amount": 9920.0,
+        "timestamp": "2022-09-03 14:45:00",
+        "payment_format": "Cash",
+        "is_laundering": true
+      },
+      {
+        "source": "BANK011_****B960",
+        "target": "BANK0224_****7B30",
+        "amount": 9500.0,
+        "timestamp": "2022-09-03 16:00:00",
+        "payment_format": "Cheque",
+        "is_laundering": true
+      },
+      {
+        "source": "BANK011_****B960",
+        "target": "BANK025400_****F420",
+        "amount": 9750.0,
+        "timestamp": "2022-09-03 16:30:00",
+        "payment_format": "Cheque",
+        "is_laundering": true
+      }
+    ],
+    "shap_breakdown": [
+      {
+        "feature": "fmt_ach",
+        "label": "ACH Electronic Settlement",
+        "value": 0.0,
+        "shap_value": -1.405694603919983,
+        "direction": "decreases_risk"
+      },
+      {
+        "feature": "dst_in_degree",
+        "label": "Destination In-Degree",
+        "value": 0.0,
+        "shap_value": 1.181511640548706,
+        "direction": "increases_risk"
+      },
+      {
+        "feature": "dst_fan_in",
+        "label": "Destination Fan-In",
+        "value": 0.0,
+        "shap_value": -0.6233338713645935,
+        "direction": "decreases_risk"
+      },
+      {
+        "feature": "burst_24h",
+        "label": "24-Hour Velocity Burst (Count)",
+        "value": 24.0,
+        "shap_value": -0.6076143980026245,
+        "direction": "decreases_risk"
+      },
+      {
+        "feature": "pagerank_ratio",
+        "label": "Network Centrality Asymmetry Ratio",
+        "value": 0.0,
+        "shap_value": 0.4072340130805969,
+        "direction": "increases_risk"
+      }
+    ],
+    "xai_explanation": {
+      "summary": "FlowTrace detected a Gather-Scatter structuring cluster around BANK011_****B960 (88.2/100 Risk Score). Inbound multi-source micro-deposits are consolidated and dispersed across disparate accounts.",
+      "risk_level": "CRITICAL",
+      "confidence_score": 0.882,
+      "key_drivers": [
+        "ACH Electronic Settlement (value=0.00, mitigating risk by 1.406 log-odds)",
+        "Destination In-Degree (value=0.00, elevating risk by 1.182 log-odds)",
+        "Destination Fan-In (value=0.00, mitigating risk by 0.623 log-odds)"
+      ],
+      "graph_motif_analysis": "Entity BANK011_****B960 operates as a high-density smurfing hub with high fan-in aggregation and immediate fan-out dispersal. Rapid balance turnover minimizes dwell time to evade standard static Threshold limits.",
+      "recommended_action": "HIGH PRIORITY: Trace downstream destination wallets and issue enhanced due diligence (EDD) requests."
+    },
+    "roi_savings": {
+      "analyst_hours_saved": 0.0,
+      "cost_savings_usd": 0.0,
+      "alert_type": "True Positive Structuring Network"
+    }
+  },
+  {
+    "id": "scenario_legitimate_payroll",
+    "name": "High-Velocity Commercial Payroll / Merchant Flow",
+    "category": "Legitimate Commercial Flow",
+    "flow_type": "high_velocity_cleared",
+    "is_laundering": false,
+    "baseline_alert": true,
+    "flowtrace_alert": false,
+    "risk_score": 8.4,
+    "target_account": "BANK011_****CA90",
+    "nodes": [
+      {
+        "id": "BANK001120_****A910",
+        "label": "Direct Commercial Payee",
+        "type": "employee_recipient",
+        "pagerank": 8e-05
+      },
+      {
+        "id": "BANK011_****CA90",
+        "label": "Corporate Merchant / Payroll Origin",
+        "type": "corporate_payroll",
+        "pagerank": 0.00095
+      }
+    ],
+    "edges": [
+      {
+        "source": "BANK011_****CA90",
+        "target": "BANK011_****CA90",
+        "amount": 3195403.0,
+        "timestamp": "2022-09-01 00:08:00",
+        "payment_format": "Reinvestment",
+        "is_laundering": false
+      },
+      {
+        "source": "BANK011_****CA90",
+        "target": "BANK001120_****A910",
+        "amount": 592571.0,
+        "timestamp": "2022-09-01 00:00:00",
+        "payment_format": "Cheque",
+        "is_laundering": false
+      }
+    ],
+    "shap_breakdown": [
+      {
+        "feature": "fmt_ach",
+        "label": "ACH Electronic Settlement",
+        "value": 0.0,
+        "shap_value": -1.2255210876464844,
+        "direction": "decreases_risk"
+      },
+      {
+        "feature": "dst_in_degree",
+        "label": "Destination In-Degree",
+        "value": 0.0,
+        "shap_value": 0.8657564520835876,
+        "direction": "increases_risk"
+      },
+      {
+        "feature": "fmt_btc",
+        "label": "Bitcoin / Crypto Settlement",
+        "value": 1.0,
+        "shap_value": 0.8259108066558838,
+        "direction": "increases_risk"
+      },
+      {
+        "feature": "pagerank_ratio",
+        "label": "Network Centrality Asymmetry Ratio",
+        "value": 0.0,
+        "shap_value": 0.7042819857597351,
+        "direction": "increases_risk"
+      },
+      {
+        "feature": "dst_fan_in",
+        "label": "Destination Fan-In",
+        "value": 0.0,
+        "shap_value": -0.7011147737503052,
+        "direction": "decreases_risk"
+      }
+    ],
+    "xai_explanation": {
+      "summary": "FlowTrace successfully CLEARED entity BANK011_****CA90 (8.4/100 Risk Score), eliminating a false-positive legacy alert. Flow dynamics reflect verified commercial clearing without smurfing or laundering topology.",
+      "risk_level": "LOW",
+      "confidence_score": 0.084,
+      "key_drivers": [
+        "ACH Electronic Settlement (value=0.00, mitigating risk by 1.226 log-odds)",
+        "Destination In-Degree (value=0.00, elevating risk by 0.866 log-odds)",
+        "Bitcoin / Crypto Settlement (value=1.00, elevating risk by 0.826 log-odds)"
+      ],
+      "graph_motif_analysis": "Entity BANK011_****CA90 exhibits legitimate merchant/payroll hub topology. Although legacy rules flagged transaction velocity or total volume, FlowTrace graph analysis confirms steady net-flow equilibrium and zero circular cycles.",
+      "recommended_action": "RESOLVE & DISMISS: Whitelist entity flow profile; estimated 0.5 compliance analyst hours saved ($25.00 ROI)."
+    },
+    "roi_savings": {
+      "analyst_hours_saved": 0.5,
+      "cost_savings_usd": 25.0,
+      "alert_type": "False Positive Cleared by Graph AI"
+    }
+  }
+]
