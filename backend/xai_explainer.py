@@ -292,13 +292,15 @@ class FlowTraceExplainer:
         entity_id: str,
         risk_score: float,
         top_contributions: List[ShapContribution],
-        motifs: Optional[Dict[str, Any]] = None
+        motifs: Optional[Dict[str, Any]] = None,
+        timeout_seconds: float = 2.5
     ) -> XAINarrative:
         """Call Google Gemini to produce structured risk narrative, with fallback.
         
         Strictly enforces PII masking on entity_id and feature descriptions before
-        sending payload over the wire.
+        sending payload over the wire. Has a strict timeout fallback.
         """
+        import concurrent.futures
         masked_entity = mask_pii(entity_id)
 
         # Fallback if no API key
@@ -328,41 +330,44 @@ Translate these SHAP values and graph motifs into a concise, professional plain-
 Return strictly valid JSON conforming to the requested schema. Never output markdown code fences or unmasked PII.
 """
 
-        try:
-            from google import genai
-            from google.genai import types
+        def _call_gemini_api() -> Optional[XAINarrative]:
+            try:
+                from google import genai
+                from google.genai import types
 
-            client = genai.Client(api_key=api_key)
-
-            # Try gemini-2.5-flash first, then gemini-3.8-flash
-            last_err = None
-            for model_name in ["gemini-2.5-flash", "gemini-3.8-flash"]:
-                try:
-                    response = client.models.generate_content(
-                        model=model_name,
-                        contents=prompt,
-                        config=types.GenerateContentConfig(
-                            response_mime_type="application/json",
-                            response_schema=XAINarrative,
-                            temperature=0.1
+                client = genai.Client(api_key=api_key)
+                for model_name in ["gemini-2.5-flash", "gemini-3.8-flash"]:
+                    try:
+                        response = client.models.generate_content(
+                            model=model_name,
+                            contents=prompt,
+                            config=types.GenerateContentConfig(
+                                response_mime_type="application/json",
+                                response_schema=XAINarrative,
+                                temperature=0.1
+                            )
                         )
-                    )
-                    if response and response.text:
-                        parsed = json.loads(response.text)
-                        # Sanitize any unexpected output with mask_pii
-                        parsed["summary"] = mask_pii(parsed.get("summary", ""))
-                        parsed["graph_motif_analysis"] = mask_pii(parsed.get("graph_motif_analysis", ""))
-                        return XAINarrative(**parsed)
-                except Exception as ex:
-                    last_err = ex
-                    continue
+                        if response and response.text:
+                            parsed = json.loads(response.text)
+                            parsed["summary"] = mask_pii(parsed.get("summary", ""))
+                            parsed["graph_motif_analysis"] = mask_pii(parsed.get("graph_motif_analysis", ""))
+                            return XAINarrative(**parsed)
+                    except Exception:
+                        continue
+                return None
+            except Exception:
+                return None
 
-            # If models failed, fallback to deterministic
-            return self.generate_deterministic_narrative(
-                masked_entity, risk_score, top_contributions, motifs
-            )
+        # Execute with strict timeout
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(_call_gemini_api)
+            try:
+                res = future.result(timeout=timeout_seconds)
+                if res is not None:
+                    return res
+            except Exception:
+                pass
 
-        except Exception:
-            return self.generate_deterministic_narrative(
-                masked_entity, risk_score, top_contributions, motifs
-            )
+        return self.generate_deterministic_narrative(
+            masked_entity, risk_score, top_contributions, motifs
+        )
