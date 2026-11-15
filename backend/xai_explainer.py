@@ -278,6 +278,14 @@ class FlowTraceExplainer:
             )
             rec = "MONITOR: Continue standard transaction monitoring without freezing assets."
 
+        if motifs.get("blacklisted", False):
+            risk_level = "CRITICAL"
+            summary = (
+                f"Entity {masked_entity} matched verified Threat Intelligence blacklists with a {risk_score:.1f}/100 Risk Score. "
+                "Direct exposure to known illicit, phishing drainer, or OFAC-sanctioned activity detected."
+            )
+            rec = "BLOCK & FILE SAR: Immediately halt outbound settlement, freeze exposed funds, and escalate for SAR filing."
+
         return XAINarrative(
             summary=summary,
             risk_level=risk_level,
