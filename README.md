@@ -94,14 +94,21 @@ In accordance with institutional standards, the following architectural and mode
 
 ### Step 1: Clone & Setup Environment
 ```bash
-git clone https://github.com/miluu/flowtrace.git
+git clone https://github.com/sparkworkmiluu-debug/flowtrace.git
 cd flowtrace
 
 # Create Python virtual environment and install pinned dependencies
 python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+
+# Optional: enable Gemini narratives (an offline deterministic narrative is used otherwise)
+cp .env.example .env       # then set GEMINI_API_KEY
 ```
+
+> The benchmark pipeline and `tests/test_pipeline.py` need the IBM AML **LI-Small** dataset
+> (`LI-Small_Trans.csv`) in `data/raw/`. It is not committed; without it those 3 tests are skipped
+> and the API still serves the precomputed demo scenarios.
 
 ### Step 2: Start the FastAPI Backend
 ```bash

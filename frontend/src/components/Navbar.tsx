@@ -11,6 +11,8 @@ import { fetchHealth } from "@/lib/api";
  * and navigation links (Live Demo, GitHub, Research Memo).
  * ───────────────────────────────────────────────────────────────────── */
 
+const REPO_URL = "https://github.com/sparkworkmiluu-debug/flowtrace";
+
 export default function Navbar() {
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [dark, setDark] = useState(true);
@@ -85,14 +87,20 @@ export default function Navbar() {
             Live Demo
           </a>
           <a
-            href="https://github.com"
+            href={REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="hover:opacity-80 transition-opacity"
           >
             GitHub
           </a>
-          <a href="#research" className="hover:opacity-80 transition-opacity">
+          {/* No in-page #research section exists; the research write-up lives in the README. */}
+          <a
+            href={`${REPO_URL}#readme`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:opacity-80 transition-opacity"
+          >
             Research Memo
           </a>
         </div>

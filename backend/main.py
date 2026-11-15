@@ -15,7 +15,7 @@ import os
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 from fastapi import FastAPI, HTTPException, Request, status
@@ -35,8 +35,34 @@ from backend.xai_explainer import (
     FEATURE_NAMES,
 )
 
-# Initialize Rate Limiter: 10 requests per minute per IP for analysis endpoint
-limiter = Limiter(key_func=get_remote_address)
+BACKEND_DIR = Path(__file__).resolve().parent
+
+# Hard cap on submitted edges: keeps cycle detection and feature building bounded.
+MAX_TRANSACTIONS = 2000
+
+_LOOPBACK_HOSTS = {"127.0.0.1", "::1", "localhost"}
+
+
+def client_ip_key(request: Request) -> str:
+    """Rate-limit key that sees through the Next.js rewrite proxy.
+
+    The frontend proxies /api/* to this server, so every request arrives from the
+    proxy's address and a plain remote-address key would make the 10 req/min limit
+    shared by ALL users. X-Forwarded-For is honored only when the direct peer is a
+    loopback proxy or FLOWTRACE_TRUST_PROXY=1, so clients cannot spoof it otherwise.
+    """
+    peer = get_remote_address(request)
+    trust_proxy = peer in _LOOPBACK_HOSTS or os.getenv("FLOWTRACE_TRUST_PROXY") == "1"
+    if trust_proxy:
+        forwarded = request.headers.get("x-forwarded-for", "")
+        first_hop = forwarded.split(",")[0].strip()
+        if first_hop:
+            return first_hop
+    return peer
+
+
+# Initialize Rate Limiter: 10 requests per minute per client IP for analysis endpoint
+limiter = Limiter(key_func=client_ip_key)
 
 app = FastAPI(
     title="FlowTrace AML Graph Intelligence API",
@@ -68,7 +94,7 @@ def load_demo_scenarios() -> List[Dict[str, Any]]:
     """Load cached precomputed demo scenarios from JSON disk storage."""
     global DEMO_SCENARIOS_CACHE
     if DEMO_SCENARIOS_CACHE is None:
-        p = Path("backend/demo_scenarios.json")
+        p = BACKEND_DIR / "demo_scenarios.json"
         if p.exists():
             with open(p, "r", encoding="utf-8") as f:
                 DEMO_SCENARIOS_CACHE = json.load(f)
@@ -101,7 +127,11 @@ class TransactionInput(BaseModel):
 class AnalyzeRequest(BaseModel):
     """Payload for POST /api/analyze."""
     entity_id: str = Field(..., min_length=3, max_length=128, description="Wallet address or Bank Account to inspect")
-    transactions: Optional[List[TransactionInput]] = Field(default_factory=list, description="Recent transaction subgraph")
+    transactions: Optional[List[TransactionInput]] = Field(
+        default_factory=list,
+        max_length=MAX_TRANSACTIONS,
+        description=f"Recent transaction subgraph (at most {MAX_TRANSACTIONS} edges)",
+    )
     time_window_hours: Optional[int] = Field(24, ge=1, le=720, description="Analysis time window in hours")
 
     @field_validator("entity_id")
@@ -159,6 +189,33 @@ class AnalyzeResponse(BaseModel):
     xai_narrative: XAINarrative
     roi_savings: ROIMetrics
     execution_time_ms: float
+
+
+def _graph_has_cycle(adjacency: Dict[str, List[str]]) -> bool:
+    """Return True if the directed graph contains any cycle (iterative 3-color DFS)."""
+    WHITE, GRAY, BLACK = 0, 1, 2
+    color: Dict[str, int] = {}
+    for root in adjacency:
+        if color.get(root, WHITE) != WHITE:
+            continue
+        color[root] = GRAY
+        stack = [(root, iter(adjacency.get(root, [])))]
+        while stack:
+            node, neighbors = stack[-1]
+            advanced = False
+            for nxt in neighbors:
+                state = color.get(nxt, WHITE)
+                if state == GRAY:
+                    return True
+                if state == WHITE:
+                    color[nxt] = GRAY
+                    stack.append((nxt, iter(adjacency.get(nxt, []))))
+                    advanced = True
+                    break
+            if not advanced:
+                color[node] = BLACK
+                stack.pop()
+    return False
 
 
 # --------------------------------------------------------------------------
@@ -285,31 +342,12 @@ async def analyze_wallet(request: Request, payload: AnalyzeRequest):
             pagerank=0.001
         )
 
-    # Detect Motifs: Cycle detection (DFS)
-    has_cycle = False
+    # Detect Motifs: Cycle detection (iterative DFS — a long chain of edges
+    # would overflow Python's recursion limit with a recursive version)
     adjacency: Dict[str, List[str]] = {}
     for tx in tx_list:
         adjacency.setdefault(tx.source, []).append(tx.target)
-
-    def _dfs_cycle(curr: str, visited: Set[str], rec_stack: Set[str]) -> bool:
-        visited.add(curr)
-        rec_stack.add(curr)
-        for neighbor in adjacency.get(curr, []):
-            if neighbor not in visited:
-                if _dfs_cycle(neighbor, visited, rec_stack):
-                    return True
-            elif neighbor in rec_stack:
-                return True
-        rec_stack.remove(curr)
-        return False
-
-    visited_nodes = set()
-    rec_stack_nodes = set()
-    for n in adjacency:
-        if n not in visited_nodes:
-            if _dfs_cycle(n, visited_nodes, rec_stack_nodes):
-                has_cycle = True
-                break
+    has_cycle = _graph_has_cycle(adjacency)
 
     # Gather-Scatter Metric: 2 * fan_out * fan_in / (fan_out + fan_in + 1)
     f_out = out_degrees.get(raw_entity, 0)

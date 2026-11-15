@@ -38,9 +38,19 @@ function AnimatedNumber({
   const [display, setDisplay] = useState(0);
 
   useEffect(() => {
+    // Skip the count-up when motion is reduced or the tab is hidden: rAF is
+    // paused in background tabs, which would leave a partial number on screen.
+    const reduceMotion =
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+    if (reduceMotion || document.hidden) {
+      setDisplay(value);
+      return;
+    }
+
     const start = performance.now();
     const from = 0;
     const to = value;
+    let frame = 0;
 
     function tick(now: number) {
       const elapsed = now - start;
@@ -48,19 +58,47 @@ function AnimatedNumber({
       // Ease-out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setDisplay(from + (to - from) * eased);
-      if (progress < 1) requestAnimationFrame(tick);
+      if (progress < 1) frame = requestAnimationFrame(tick);
     }
-    requestAnimationFrame(tick);
+    frame = requestAnimationFrame(tick);
+
+    // Safety net: some embedded/occluded views throttle rAF without reporting
+    // document.hidden, so always land on the final value shortly after the duration.
+    const settle = window.setTimeout(() => {
+      cancelAnimationFrame(frame);
+      setDisplay(value);
+    }, duration + 150);
+
+    // Jump to the final value if the tab is hidden mid-animation.
+    const onVisibility = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(frame);
+        setDisplay(value);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(settle);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, [value, duration]);
 
+  const fmt = (n: number) =>
+    n.toLocaleString("en-US", {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    });
+
   return (
-    <span className="tabular-nums font-mono">
-      {prefix}
-      {display.toLocaleString("en-US", {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals,
-      })}
-      {suffix}
+    // Screen readers and text scrapers get the final figure, not a mid-animation frame.
+    <span className="tabular-nums font-mono" aria-label={`${prefix}${fmt(value)}${suffix}`}>
+      <span aria-hidden="true">
+        {prefix}
+        {fmt(display)}
+        {suffix}
+      </span>
     </span>
   );
 }

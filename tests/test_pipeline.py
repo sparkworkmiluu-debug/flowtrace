@@ -13,6 +13,16 @@ import duckdb
 
 from backend.pipeline import get_data_source, run_pipeline, BenchmarkMetrics
 
+RAW_DIR = Path("data/raw")
+_HAS_DATASET = (RAW_DIR / "transactions.parquet").exists() or (RAW_DIR / "LI-Small_Trans.csv").exists()
+
+# The IBM AML LI-Small dataset (~6.3M rows) is not committed to the repo, so these
+# tests skip instead of failing on a fresh clone. Place LI-Small_Trans.csv in data/raw/ to run them.
+pytestmark = pytest.mark.skipif(
+    not _HAS_DATASET,
+    reason="IBM AML dataset not found in data/raw/ (LI-Small_Trans.csv or transactions.parquet)",
+)
+
 
 def test_data_source_resolution():
     """Verify data source resolves properly."""
