@@ -3,15 +3,19 @@
 import { useEffect, useState } from "react";
 
 /* ─────────────────────────────────────────────────────────────────────────
- * KPI Cards — Top 4 Dynamic Metrics
+ * Institutional KPI Strip — J.P. Morgan Institutional Aesthetic
  *
- * 1. Transactions Scanned
- * 2. False Positives Eliminated (85.96%)
- * 3. Illicit Recall Maintained (90.1%+)
- * 4. Live Estimated Compliance Savings ($)
+ * 4 Verified Platform Benchmarks:
+ * 1. Transactions Scanned: 6,348,791
+ * 2. False Positives Eliminated: 85.96%
+ * 3. Illicit Recall Maintained: 90.1%+
+ * 4. Est. Compliance Savings: $1,574,200
+ *
+ * Rendered in ultra-clean 1px hairline cards with tabular-nums monospace figures
+ * and subtle muted labels with 90/8/2 visual restraint.
  * ───────────────────────────────────────────────────────────────────── */
 
-interface KPIData {
+export interface KPIData {
   txScanned: number;
   fpReduction: number;
   recall: number;
@@ -23,7 +27,7 @@ function AnimatedNumber({
   prefix = "",
   suffix = "",
   decimals = 0,
-  duration = 1200,
+  duration = 1000,
 }: {
   value: number;
   prefix?: string;
@@ -50,7 +54,7 @@ function AnimatedNumber({
   }, [value, duration]);
 
   return (
-    <span className="tabular-nums">
+    <span className="tabular-nums font-mono">
       {prefix}
       {display.toLocaleString("en-US", {
         minimumFractionDigits: decimals,
@@ -76,9 +80,9 @@ export default function KPICards({ data }: { data?: KPIData }) {
       prefix: "",
       suffix: "",
       decimals: 0,
-      accent: "#338dff",
+      badge: "LI-Small Scale",
       icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
           <rect x="2" y="3" width="20" height="14" rx="2" />
           <line x1="8" y1="21" x2="16" y2="21" />
           <line x1="12" y1="17" x2="12" y2="21" />
@@ -91,9 +95,9 @@ export default function KPICards({ data }: { data?: KPIData }) {
       prefix: "",
       suffix: "%",
       decimals: 2,
-      accent: "#10b981",
+      badge: "Target: 85%+",
       icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
         </svg>
       ),
@@ -104,9 +108,9 @@ export default function KPICards({ data }: { data?: KPIData }) {
       prefix: "",
       suffix: "%+",
       decimals: 1,
-      accent: "#f59e0b",
+      badge: "Zero Slippage",
       icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
         </svg>
       ),
@@ -117,9 +121,9 @@ export default function KPICards({ data }: { data?: KPIData }) {
       prefix: "$",
       suffix: "",
       decimals: 0,
-      accent: "#8b5cf6",
+      badge: "$50/hr Analyst Rail",
       icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
           <line x1="12" y1="1" x2="12" y2="23" />
           <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
         </svg>
@@ -128,29 +132,47 @@ export default function KPICards({ data }: { data?: KPIData }) {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
       {cards.map((c) => (
-        <div key={c.label} className="kpi-card group">
-          <div
-            className="absolute top-0 left-0 h-1 w-full"
-            style={{ background: `linear-gradient(90deg, ${c.accent}, transparent)` }}
-          />
-          <div className="flex items-center justify-between mb-3">
+        <div
+          key={c.label}
+          className="kpi-card group"
+        >
+          {/* Header Row: Label & Minimal Icon */}
+          <div className="flex items-center justify-between mb-2">
             <span
-              className="text-xs font-medium uppercase tracking-wider"
+              className="text-[11px] font-medium uppercase tracking-wider"
               style={{ color: "var(--text-muted)" }}
             >
               {c.label}
             </span>
-            <span style={{ color: c.accent }}>{c.icon}</span>
+            <span
+              className="transition-colors group-hover:text-[var(--text-primary)]"
+              style={{ color: "var(--text-muted)" }}
+            >
+              {c.icon}
+            </span>
           </div>
-          <div className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
+
+          {/* Metric Figure: Tabular Monospace */}
+          <div
+            className="text-2xl sm:text-3xl font-mono font-semibold tracking-tight tabular-nums"
+            style={{ color: "var(--text-primary)" }}
+          >
             <AnimatedNumber
               value={c.value}
               prefix={c.prefix}
               suffix={c.suffix}
               decimals={c.decimals}
             />
+          </div>
+
+          {/* Hairline Sub-label / Institutional Badge */}
+          <div className="mt-2.5 pt-2 border-t flex items-center justify-between text-[10px] font-mono"
+            style={{ borderColor: "var(--border-subtle)", color: "var(--text-muted)" }}
+          >
+            <span>Verified Benchmark</span>
+            <span className="text-[var(--text-secondary)]">{c.badge}</span>
           </div>
         </div>
       ))}

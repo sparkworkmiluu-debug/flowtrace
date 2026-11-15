@@ -18,9 +18,11 @@ import type {
 } from "@/lib/types";
 
 /* ─────────────────────────────────────────────────────────────────────────
- * Main Dashboard Page — Phase 3 Public Interactive Frontend
+ * Main Dashboard Page — Refined Gemini Command Bar + J.P. Morgan Institutional
  *
- * Orchestrates: KPI Cards → Demo Selector → Graph Canvas → XAI Drawer
+ * Orchestration:
+ * - When !result: Clean institutional KPI strip + Centered Hero Command Bar
+ * - When result: Compact workspace view + Interactive Graph Canvas + XAI Drawer (xl:pr-[420px])
  * ───────────────────────────────────────────────────────────────────── */
 
 interface ActiveResult {
@@ -69,7 +71,7 @@ export default function DashboardPage() {
         shapBreakdown: s.shap_breakdown,
         narrative: s.xai_explanation,
         roi: s.roi_savings,
-        executionTime: 2.5, // precomputed
+        executionTime: 2.5, // precomputed benchmark latency
       });
       setDrawerOpen(true);
     },
@@ -104,104 +106,89 @@ export default function DashboardPage() {
     }
   }, []);
 
+  // Reset to Hero Command Bar mode
+  const handleReset = useCallback(() => {
+    setResult(null);
+    setActiveScenario(null);
+    setDrawerOpen(false);
+    setError(null);
+  }, []);
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ background: "var(--bg-primary)" }}>
       <Navbar />
 
       <main
-        className={`flex-1 max-w-[1440px] mx-auto w-full px-6 py-6 space-y-6 transition-all duration-300 ${
-          drawerOpen ? "xl:pr-[420px]" : ""
+        className={`flex-1 max-w-[1440px] mx-auto w-full px-6 py-6 space-y-6 transition-all duration-300 ease-in-out ${
+          result && drawerOpen ? "xl:pr-[420px]" : ""
         }`}
       >
-        {/* KPI Cards */}
+        {/* Institutional KPI Strip (Always visible: Top 4 Verified Metrics) */}
         <KPICards />
 
-        {/* Demo Selector */}
+        {/* Gemini-Style Command Bar: Hero Mode (!result) vs Compact Workspace (result) */}
         <DemoSelector
           activeScenario={activeScenario}
           onSelectScenario={handleSelectScenario}
           onAnalyze={handleAnalyze}
           isLoading={isLoading}
+          hasResult={Boolean(result)}
+          onReset={handleReset}
         />
 
-        {/* Error Banner */}
+        {/* Error Notification Banner */}
         {error && (
           <div
-            className="px-4 py-3 rounded-lg text-sm"
+            className="px-4 py-3 rounded-xl text-sm border flex items-center justify-between"
             style={{
-              background: "rgba(239,68,68,0.1)",
+              background: "rgba(239,68,68,0.08)",
               color: "var(--risk-critical)",
-              border: "1px solid rgba(239,68,68,0.2)",
+              borderColor: "rgba(239,68,68,0.25)",
             }}
           >
-            ⚠️ {error}
+            <span>⚠️ {error}</span>
+            <button
+              onClick={() => setError(null)}
+              className="text-xs font-mono opacity-70 hover:opacity-100"
+            >
+              Dismiss
+            </button>
           </div>
         )}
 
-        {/* Graph Canvas */}
+        {/* Interactive Graph Canvas (Visible when scan/scenario result is active) */}
         {result && (
-          <div className="w-full">
+          <div className="w-full transition-all duration-300 animate-fadeIn">
             <GraphCanvas
               nodes={result.graphNodes}
               edges={result.graphEdges}
               baselineAlert={result.baselineAlert}
               flowtraceAlert={result.flowtraceAlert}
               riskScore={result.riskScore}
-              onNodeClick={(id) => {
+              onNodeClick={() => {
                 setDrawerOpen(true);
               }}
             />
           </div>
         )}
 
-        {/* Empty state */}
-        {!result && !isLoading && (
-          <div
-            className="flex flex-col items-center justify-center py-20 rounded-xl"
-            style={{
-              background: "var(--bg-secondary)",
-              border: "1px dashed var(--border-default)",
-            }}
-          >
-            <svg
-              width="48"
-              height="48"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="var(--text-muted)"
-              strokeWidth="1.5"
-              className="mb-4 opacity-50"
-            >
-              <path d="M12 2L2 7l10 5 10-5-10-5z" />
-              <path d="M2 17l10 5 10-5" />
-              <path d="M2 12l10 5 10-5" />
-            </svg>
-            <p
-              className="text-sm font-medium"
-              style={{ color: "var(--text-muted)" }}
-            >
-              Select a demo scenario or scan a wallet to begin
-            </p>
-          </div>
-        )}
-
-        {/* Loading spinner */}
+        {/* Loading Spinner with Institutional Monospace Indicator */}
         {isLoading && (
-          <div className="flex items-center justify-center py-20">
+          <div className="flex items-center justify-center py-24">
             <div className="flex flex-col items-center gap-3">
               <svg className="animate-spin h-8 w-8" style={{ color: "var(--accent)" }} viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
               </svg>
-              <span className="text-sm" style={{ color: "var(--text-muted)" }}>
-                Running Graph ML analysis...
+              <span className="text-xs font-mono tracking-wide" style={{ color: "var(--text-muted)" }}>
+                Evaluating Graph Motifs & Topology Risk...
               </span>
             </div>
           </div>
         )}
       </main>
 
-      {/* XAI & ROI Drawer */}
+      {/* XAI & Counterfactual ROI Drawer */}
       {result && (
         <XAIDrawer
           riskScore={result.riskScore}
@@ -215,7 +202,7 @@ export default function DashboardPage() {
         />
       )}
 
-      {/* Footer */}
+      {/* Minimal Institutional Footer */}
       <footer
         className="border-t py-4 text-center text-xs"
         style={{
@@ -223,7 +210,7 @@ export default function DashboardPage() {
           color: "var(--text-muted)",
         }}
       >
-        FlowTrace v3.0 — Graph AML Intelligence Platform • Built for Georgia Tech MS QCF
+        FlowTrace v3.0 — Graph AML Intelligence Platform • Georgia Tech MS QCF Capstone
       </footer>
     </div>
   );

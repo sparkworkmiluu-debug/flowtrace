@@ -416,11 +416,11 @@ export default function GraphCanvas({
             </strong>
           </span>
         </div>
-        <div className="flex items-center gap-2 font-mono">
+        <div className="flex items-center gap-2 font-mono tabular-nums">
           <span className="hidden sm:inline" style={{ color: "var(--text-muted)" }}>
             Calibrated Risk:
           </span>
-          <span className="px-2 py-0.5 rounded-md bg-current/10">
+          <span className="px-2 py-0.5 rounded-md bg-current/10 font-bold">
             {riskScore.toFixed(1)} / 100
           </span>
         </div>
@@ -508,19 +508,19 @@ export default function GraphCanvas({
               </div>
               <div>
                 <span style={{ color: "var(--text-muted)" }}>PageRank: </span>
-                <span className="font-mono font-bold" style={{ color: "var(--text-primary)" }}>
+                <span className="font-mono font-bold tabular-nums" style={{ color: "var(--text-primary)" }}>
                   {selectedNodeDetails.pagerank.toFixed(5)}
                 </span>
               </div>
               <div>
                 <span style={{ color: "var(--text-muted)" }}>In / Out Degree: </span>
-                <span className="font-mono font-semibold" style={{ color: "var(--text-primary)" }}>
+                <span className="font-mono font-semibold tabular-nums" style={{ color: "var(--text-primary)" }}>
                   {selectedNodeDetails.inDegree} in / {selectedNodeDetails.outDegree} out
                 </span>
               </div>
               <div>
                 <span style={{ color: "var(--text-muted)" }}>Total Volume: </span>
-                <span className="font-mono font-bold text-emerald-500">
+                <span className="font-mono font-bold text-emerald-500 tabular-nums">
                   ${selectedNodeDetails.totalVolume.toLocaleString()}
                 </span>
               </div>

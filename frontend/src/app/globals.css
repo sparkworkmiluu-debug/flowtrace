@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
-
 @layer base {
   :root {
     --bg-primary: #ffffff;
@@ -16,47 +14,58 @@
     --border-default: #e2e8f0;
     --border-subtle: #f1f5f9;
     --accent: #2563eb;
-    --accent-glow: rgba(37, 99, 235, 0.12);
+    --accent-glow: rgba(37, 99, 235, 0.08);
     --risk-critical: #e11d48;
     --risk-high: #ea580c;
     --risk-medium: #d97706;
     --risk-low: #059669;
     --success: #10b981;
-    --card-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.04);
-    --card-shadow-hover: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+    --card-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+    --card-shadow-hover: 0 4px 12px 0 rgba(15, 23, 42, 0.06);
   }
 
   .dark {
-    --bg-primary: #090d16;
+    --bg-primary: #0b0f17;
     --bg-secondary: #0f172a;
-    --bg-tertiary: #1e293b;
-    --bg-card: #111a2e;
+    --bg-tertiary: #162032;
+    --bg-card: #0f172a;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
     --border-default: #1e293b;
-    --border-subtle: #172033;
+    --border-subtle: #162032;
     --accent: #3b82f6;
-    --accent-glow: rgba(59, 130, 246, 0.15);
+    --accent-glow: rgba(59, 130, 246, 0.08);
     --risk-critical: #fb7185;
     --risk-high: #fb923c;
     --risk-medium: #fbbf24;
     --risk-low: #34d399;
     --success: #34d399;
-    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
-    --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25);
+    --card-shadow-hover: 0 4px 12px 0 rgba(0, 0, 0, 0.35);
   }
 
   body {
     @apply font-sans antialiased;
     background: var(--bg-primary);
     color: var(--text-primary);
-    transition: background-color 0.25s ease, color 0.25s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+}
+
+@layer utilities {
+  .tabular-nums,
+  .kpi-number,
+  .risk-score,
+  .currency-amount,
+  .metric-figure {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
   }
 }
 
 @layer components {
-  /* Institutional Glassmorphism Cards */
+  /* Institutional 1px Hairline Cards — 90/8/2 Visual Restraint */
   .glass-card {
     background: var(--bg-card);
     border: 1px solid var(--border-default);
@@ -69,63 +78,69 @@
   }
   .glass-card-hover:hover {
     box-shadow: var(--card-shadow-hover);
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     border-color: rgba(59, 130, 246, 0.35);
   }
 
   .kpi-card {
-    @apply glass-card p-5 relative overflow-hidden;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    box-shadow: var(--card-shadow);
+    @apply rounded-xl p-5 relative overflow-hidden transition-all duration-200;
   }
-
-  .kpi-card::before {
-    content: "";
-    @apply absolute top-0 left-0 h-1 w-full;
-    background: linear-gradient(90deg, var(--accent), transparent);
+  .kpi-card:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--card-shadow-hover);
+    border-color: rgba(59, 130, 246, 0.3);
   }
 
   .btn-primary {
-    @apply px-5 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 inline-flex items-center justify-center gap-2;
+    @apply px-4 py-2 rounded-lg font-semibold text-xs sm:text-sm transition-all duration-200 inline-flex items-center justify-center gap-2;
     background: var(--accent);
     color: white;
   }
   .btn-primary:hover {
-    filter: brightness(1.1);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 14px var(--accent-glow);
+    filter: brightness(1.08);
+    transform: translateY(-0.5px);
+    box-shadow: 0 2px 8px var(--accent-glow);
   }
 
-  /* Stripe/Linear-style Scenario Button Card */
+  /* Institutional Scenario Cards */
   .btn-scenario-card {
-    @apply glass-card p-4 text-left cursor-pointer transition-all duration-200 relative overflow-hidden flex flex-col justify-between;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    box-shadow: var(--card-shadow);
+    @apply p-4 text-left cursor-pointer transition-all duration-200 relative overflow-hidden flex flex-col justify-between rounded-xl;
   }
   .btn-scenario-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow: var(--card-shadow-hover);
-    border-color: rgba(59, 130, 246, 0.4);
+    border-color: rgba(59, 130, 246, 0.35);
   }
   .btn-scenario-card.active {
     border-color: var(--accent);
-    box-shadow: 0 0 0 2px var(--accent), 0 8px 20px var(--accent-glow);
-    background: linear-gradient(135deg, var(--bg-card) 0%, var(--accent-glow) 100%);
+    box-shadow: 0 0 0 1px var(--accent);
+    background: var(--bg-card);
   }
 
-  /* Badges */
+  /* Badges with 1px Hairline Borders */
   .badge-tp {
     @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase border;
     background: rgba(225, 29, 72, 0.08);
     color: #f43f5e;
-    border-color: rgba(225, 29, 72, 0.25);
+    border-color: rgba(225, 29, 72, 0.2);
   }
 
   .badge-fpc {
     @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase border;
     background: rgba(16, 185, 129, 0.08);
     color: #10b981;
-    border-color: rgba(16, 185, 129, 0.25);
+    border-color: rgba(16, 185, 129, 0.2);
   }
 
   .risk-badge {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider;
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider tabular-nums font-mono border;
+    border-color: currentColor;
   }
 
   .shap-bar-positive {
@@ -149,7 +164,7 @@
 
   @keyframes pulse-glow {
     0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--success); }
-    50% { opacity: 0.8; box-shadow: 0 0 8px 3px var(--success); }
+    50% { opacity: 0.8; box-shadow: 0 0 6px 1px var(--success); }
   }
 
   .slide-in {
@@ -169,16 +184,16 @@
   }
 
   .dot-grid-bg {
-    background-image: radial-gradient(rgba(148, 163, 184, 0.25) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(148, 163, 184, 0.2) 1px, transparent 1px);
     background-size: 20px 20px;
   }
   .dark .dot-grid-bg {
-    background-image: radial-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px);
     background-size: 20px 20px;
   }
 
   .cytoscape-container {
     @apply w-full;
-    height: 520px;
+    height: 540px;
   }
 }

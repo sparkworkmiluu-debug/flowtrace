@@ -56,12 +56,12 @@ function RiskGauge({ score, level }: { score: number; level: string }) {
           />
         </svg>
       </div>
-      <div className="text-3xl font-bold -mt-4" style={{ color }}>
+      <div className="text-3xl font-bold -mt-4 font-mono tabular-nums" style={{ color }}>
         {score.toFixed(1)}
       </div>
       <div
-        className="risk-badge mt-2"
-        style={{ background: `${color}20`, color }}
+        className="risk-badge mt-2 tabular-nums font-mono"
+        style={{ background: `${color}15`, color, borderColor: `${color}40` }}
       >
         {level}
       </div>
@@ -91,7 +91,7 @@ function ShapBars({ contributions }: { contributions: ShapContribution[] }) {
                 {c.label}
               </span>
               <span
-                className="font-mono text-xs font-medium"
+                className="font-mono text-xs font-semibold tabular-nums"
                 style={{
                   color: isPositive ? "var(--risk-critical)" : "var(--risk-low)",
                 }}
@@ -130,7 +130,7 @@ function ROICalculator({ roi }: { roi: ROIMetrics }) {
         <span style={{ color: "var(--text-secondary)" }}>
           Analyst Hourly Rate
         </span>
-        <span className="font-mono font-bold" style={{ color: "var(--accent)" }}>
+        <span className="font-mono font-bold tabular-nums" style={{ color: "var(--accent)" }}>
           ${hourlyRate}/hr
         </span>
       </div>
@@ -141,32 +141,32 @@ function ROICalculator({ roi }: { roi: ROIMetrics }) {
         step={5}
         value={hourlyRate}
         onChange={(e) => setHourlyRate(Number(e.target.value))}
-        className="w-full h-2 rounded-lg cursor-pointer accent-blue-500"
+        className="w-full h-1.5 rounded-lg cursor-pointer accent-blue-500"
         style={{ background: "var(--bg-tertiary)" }}
       />
-      <div className="flex justify-between text-xs" style={{ color: "var(--text-muted)" }}>
+      <div className="flex justify-between text-xs font-mono tabular-nums" style={{ color: "var(--text-muted)" }}>
         <span>$25/hr</span>
         <span>$200/hr</span>
       </div>
 
       <div
-        className="glass-card p-4 mt-2 space-y-2"
-        style={{ borderColor: "var(--accent)" }}
+        className="glass-card p-4 mt-2 space-y-2 border"
+        style={{ borderColor: "var(--border-default)" }}
       >
         <div className="flex justify-between text-xs">
           <span style={{ color: "var(--text-secondary)" }}>FP Alerts Saved / 1M</span>
-          <span className="font-mono font-bold">{fpSavedPerMillion.toLocaleString()}</span>
+          <span className="font-mono font-bold tabular-nums">{fpSavedPerMillion.toLocaleString()}</span>
         </div>
         <div className="flex justify-between text-xs">
           <span style={{ color: "var(--text-secondary)" }}>Hours Saved / 1M</span>
-          <span className="font-mono font-bold">{hoursSavedPerMillion.toLocaleString()}</span>
+          <span className="font-mono font-bold tabular-nums">{hoursSavedPerMillion.toLocaleString()}</span>
         </div>
         <div
           className="flex justify-between text-sm font-bold pt-2 border-t"
           style={{ borderColor: "var(--border-default)" }}
         >
           <span style={{ color: "var(--text-primary)" }}>Annual Savings</span>
-          <span style={{ color: "var(--success)" }}>
+          <span className="font-mono font-bold tabular-nums" style={{ color: "var(--success)" }}>
             ${annualSavings.toLocaleString()}
           </span>
         </div>
@@ -175,10 +175,11 @@ function ROICalculator({ roi }: { roi: ROIMetrics }) {
       {/* Current scenario ROI */}
       {roi.analyst_hours_saved > 0 && (
         <div
-          className="text-xs px-3 py-2 rounded-lg"
+          className="text-xs px-3 py-2 rounded-lg font-mono tabular-nums"
           style={{
-            background: "rgba(16,185,129,0.1)",
+            background: "rgba(16,185,129,0.08)",
             color: "var(--success)",
+            border: "1px solid rgba(16,185,129,0.2)",
           }}
         >
           ✅ This alert: {roi.analyst_hours_saved}h saved (${roi.cost_savings_usd.toFixed(2)}) — {roi.alert_type}
@@ -237,7 +238,7 @@ export default function XAIDrawer({
 
         {/* Execution time */}
         <div
-          className="text-center text-xs font-mono"
+          className="text-center text-xs font-mono tabular-nums"
           style={{ color: "var(--text-muted)" }}
         >
           Analysis completed in {executionTime.toFixed(1)}ms
