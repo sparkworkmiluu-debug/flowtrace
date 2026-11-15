@@ -12,46 +12,46 @@
     "nodes": [
       {
         "id": "BANK000_****D1A0",
-        "label": "Ring Node 1 (Origin/Hop)",
+        "label": "Node 1 (Origin/Hop)",
         "type": "ring_origin",
         "pagerank": 0.00042
       },
       {
         "id": "BANK01595_****1FD0",
-        "label": "Ring Node 2 (Intermediary Hop)",
+        "label": "Node 2 (Intermediary Hop)",
         "type": "ring_hop",
         "pagerank": 0.00038
       },
       {
         "id": "BANK023848_****BC80",
-        "label": "Ring Node 3 (Intermediary Hop)",
+        "label": "Node 3 (Intermediary Hop)",
         "type": "ring_hop",
         "pagerank": 0.00038
       }
     ],
     "edges": [
       {
+        "source": "BANK023848_****BC80",
+        "target": "BANK000_****D1A0",
+        "amount": 10130.1,
+        "timestamp": "2022-09-06 17:19:00",
+        "payment_format": "ACH",
+        "is_laundering": true
+      },
+      {
         "source": "BANK000_****D1A0",
         "target": "BANK01595_****1FD0",
-        "amount": 1547.24,
-        "timestamp": "2022-09-02 08:14:00",
-        "payment_format": "Credit Card",
+        "amount": 7713.7,
+        "timestamp": "2022-09-10 18:52:00",
+        "payment_format": "ACH",
         "is_laundering": true
       },
       {
         "source": "BANK01595_****1FD0",
         "target": "BANK023848_****BC80",
-        "amount": 1547.24,
-        "timestamp": "2022-09-02 09:30:00",
-        "payment_format": "Credit Card",
-        "is_laundering": true
-      },
-      {
-        "source": "BANK023848_****BC80",
-        "target": "BANK000_****D1A0",
-        "amount": 1547.24,
-        "timestamp": "2022-09-02 11:45:00",
-        "payment_format": "Credit Card",
+        "amount": 7629.67,
+        "timestamp": "2022-09-11 06:36:00",
+        "payment_format": "ACH",
         "is_laundering": true
       }
     ],
@@ -122,67 +122,123 @@
     "target_account": "BANK011_****B960",
     "nodes": [
       {
+        "id": "BANK000_****EF10",
+        "label": "Outbound Mules",
+        "type": "dispersal_target",
+        "pagerank": 0.00015
+      },
+      {
+        "id": "BANK003_****A9D0",
+        "label": "Inbound Feeder",
+        "type": "smurf_feeder",
+        "pagerank": 0.00015
+      },
+      {
+        "id": "BANK00423_****1910",
+        "label": "Outbound Mules",
+        "type": "dispersal_target",
+        "pagerank": 0.00015
+      },
+      {
+        "id": "BANK00498_****BF50",
+        "label": "Inbound Feeder",
+        "type": "smurf_feeder",
+        "pagerank": 0.00015
+      },
+      {
+        "id": "BANK008_****5310",
+        "label": "Outbound Mules",
+        "type": "dispersal_target",
+        "pagerank": 0.00015
+      },
+      {
         "id": "BANK011_****B960",
         "label": "Central Smurfing Hub",
         "type": "hub_aggregator",
         "pagerank": 0.00185
       },
       {
-        "id": "BANK020_****3210",
-        "label": "Inbound Smurf Feeder A",
+        "id": "BANK01231_****4820",
+        "label": "Outbound Mules",
+        "type": "dispersal_target",
+        "pagerank": 0.00015
+      },
+      {
+        "id": "BANK01394_****FC60",
+        "label": "Inbound Feeder",
         "type": "smurf_feeder",
         "pagerank": 0.00015
       },
       {
-        "id": "BANK01595_****83C0",
-        "label": "Inbound Smurf Feeder B",
+        "id": "BANK0224_****A6B0",
+        "label": "Inbound Feeder",
         "type": "smurf_feeder",
-        "pagerank": 0.00018
-      },
-      {
-        "id": "BANK0224_****7B30",
-        "label": "Outbound Dispersal Mule 1",
-        "type": "dispersal_target",
-        "pagerank": 0.00022
-      },
-      {
-        "id": "BANK025400_****F420",
-        "label": "Outbound Dispersal Mule 2",
-        "type": "dispersal_target",
-        "pagerank": 0.00025
+        "pagerank": 0.00015
       }
     ],
     "edges": [
       {
-        "source": "BANK020_****3210",
+        "source": "BANK003_****A9D0",
         "target": "BANK011_****B960",
-        "amount": 9850.0,
-        "timestamp": "2022-09-03 14:10:00",
-        "payment_format": "Cash",
+        "amount": 15918.54,
+        "timestamp": "2022-09-05 17:13:00",
+        "payment_format": "ACH",
         "is_laundering": true
       },
       {
-        "source": "BANK01595_****83C0",
+        "source": "BANK01394_****FC60",
         "target": "BANK011_****B960",
-        "amount": 9920.0,
-        "timestamp": "2022-09-03 14:45:00",
-        "payment_format": "Cash",
+        "amount": 12812.43,
+        "timestamp": "2022-09-06 13:20:00",
+        "payment_format": "ACH",
+        "is_laundering": true
+      },
+      {
+        "source": "BANK0224_****A6B0",
+        "target": "BANK011_****B960",
+        "amount": 12238.27,
+        "timestamp": "2022-09-07 02:19:00",
+        "payment_format": "ACH",
+        "is_laundering": true
+      },
+      {
+        "source": "BANK00498_****BF50",
+        "target": "BANK011_****B960",
+        "amount": 14728.44,
+        "timestamp": "2022-09-07 03:00:00",
+        "payment_format": "ACH",
         "is_laundering": true
       },
       {
         "source": "BANK011_****B960",
-        "target": "BANK0224_****7B30",
-        "amount": 9500.0,
-        "timestamp": "2022-09-03 16:00:00",
-        "payment_format": "Cheque",
+        "target": "BANK008_****5310",
+        "amount": 2506.79,
+        "timestamp": "2022-09-09 21:51:00",
+        "payment_format": "ACH",
         "is_laundering": true
       },
       {
         "source": "BANK011_****B960",
-        "target": "BANK025400_****F420",
-        "amount": 9750.0,
-        "timestamp": "2022-09-03 16:30:00",
-        "payment_format": "Cheque",
+        "target": "BANK01231_****4820",
+        "amount": 15207.71,
+        "timestamp": "2022-09-10 05:49:00",
+        "payment_format": "ACH",
+        "is_laundering": true
+      },
+      {
+        "source": "BANK011_****B960",
+        "target": "BANK00423_****1910",
+        "amount": 16885.58,
+        "timestamp": "2022-09-10 15:37:00",
+        "payment_format": "ACH",
+        "is_laundering": true
+      },
+      {
+        "source": "BANK011_****B960",
+        "target": "BANK000_****EF10",
+        "amount": 11004.92,
+        "timestamp": "2022-09-11 16:14:00",
+        "payment_format": "ACH",
         "is_laundering": true
       }
     ],
@@ -250,36 +306,80 @@
     "baseline_alert": true,
     "flowtrace_alert": false,
     "risk_score": 8.4,
-    "target_account": "BANK011_****CA90",
+    "target_account": "BANK002368_****0470",
     "nodes": [
       {
-        "id": "BANK001120_****A910",
-        "label": "Direct Commercial Payee",
+        "id": "BANK002368_****0470",
+        "label": "Corporate Payroll Origin",
+        "type": "corporate_payroll",
+        "pagerank": 0.00095
+      },
+      {
+        "id": "BANK0065257_****34D0",
+        "label": "Direct Deposit Recipient",
         "type": "employee_recipient",
         "pagerank": 8e-05
       },
       {
-        "id": "BANK011_****CA90",
-        "label": "Corporate Merchant / Payroll Origin",
-        "type": "corporate_payroll",
-        "pagerank": 0.00095
+        "id": "BANK012063_****1550",
+        "label": "Direct Deposit Recipient",
+        "type": "employee_recipient",
+        "pagerank": 8e-05
+      },
+      {
+        "id": "BANK0143928_****E3C0",
+        "label": "Direct Deposit Recipient",
+        "type": "employee_recipient",
+        "pagerank": 8e-05
       }
     ],
     "edges": [
       {
-        "source": "BANK011_****CA90",
-        "target": "BANK011_****CA90",
-        "amount": 3195403.0,
-        "timestamp": "2022-09-01 00:08:00",
-        "payment_format": "Reinvestment",
+        "source": "BANK002368_****0470",
+        "target": "BANK0065257_****34D0",
+        "amount": 4.23,
+        "timestamp": "2022-09-01 00:23:00",
+        "payment_format": "Credit Card",
         "is_laundering": false
       },
       {
-        "source": "BANK011_****CA90",
-        "target": "BANK001120_****A910",
-        "amount": 592571.0,
-        "timestamp": "2022-09-01 00:00:00",
+        "source": "BANK002368_****0470",
+        "target": "BANK0143928_****E3C0",
+        "amount": 88631.64,
+        "timestamp": "2022-09-01 01:45:00",
         "payment_format": "Cheque",
+        "is_laundering": false
+      },
+      {
+        "source": "BANK002368_****0470",
+        "target": "BANK0143928_****E3C0",
+        "amount": 3486.96,
+        "timestamp": "2022-09-01 01:45:00",
+        "payment_format": "Credit Card",
+        "is_laundering": false
+      },
+      {
+        "source": "BANK002368_****0470",
+        "target": "BANK012063_****1550",
+        "amount": 654.69,
+        "timestamp": "2022-09-01 11:25:00",
+        "payment_format": "Cheque",
+        "is_laundering": false
+      },
+      {
+        "source": "BANK002368_****0470",
+        "target": "BANK012063_****1550",
+        "amount": 1430.92,
+        "timestamp": "2022-09-01 11:08:00",
+        "payment_format": "Credit Card",
+        "is_laundering": false
+      },
+      {
+        "source": "BANK002368_****0470",
+        "target": "BANK002368_****0470",
+        "amount": 2316238694.34,
+        "timestamp": "2022-09-01 17:51:00",
+        "payment_format": "ACH",
         "is_laundering": false
       }
     ],
@@ -321,7 +421,7 @@
       }
     ],
     "xai_explanation": {
-      "summary": "FlowTrace successfully CLEARED entity BANK011_****CA90 (8.4/100 Risk Score), eliminating a false-positive legacy alert. Flow dynamics reflect verified commercial clearing without smurfing or laundering topology.",
+      "summary": "FlowTrace successfully CLEARED entity BANK002368_****0470 (8.4/100 Risk Score), eliminating a false-positive legacy alert. Flow dynamics reflect verified commercial clearing without smurfing or laundering topology.",
       "risk_level": "LOW",
       "confidence_score": 0.084,
       "key_drivers": [
@@ -329,7 +429,7 @@
         "Destination In-Degree (value=0.00, elevating risk by 0.866 log-odds)",
         "Bitcoin / Crypto Settlement (value=1.00, elevating risk by 0.826 log-odds)"
       ],
-      "graph_motif_analysis": "Entity BANK011_****CA90 exhibits legitimate merchant/payroll hub topology. Although legacy rules flagged transaction velocity or total volume, FlowTrace graph analysis confirms steady net-flow equilibrium and zero circular cycles.",
+      "graph_motif_analysis": "Entity BANK002368_****0470 exhibits legitimate merchant/payroll hub topology. Although legacy rules flagged transaction velocity or total volume, FlowTrace graph analysis confirms steady net-flow equilibrium and zero circular cycles.",
       "recommended_action": "RESOLVE & DISMISS: Whitelist entity flow profile; estimated 0.5 compliance analyst hours saved ($25.00 ROI)."
     },
     "roi_savings": {
