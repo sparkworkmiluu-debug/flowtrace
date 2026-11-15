@@ -15,50 +15,62 @@
     --text-muted: #94a3b8;
     --border-default: #e2e8f0;
     --border-subtle: #f1f5f9;
-    --accent: #338dff;
-    --accent-glow: rgba(51, 141, 255, 0.15);
-    --risk-critical: #ef4444;
-    --risk-high: #f97316;
-    --risk-medium: #eab308;
-    --risk-low: #22c55e;
+    --accent: #2563eb;
+    --accent-glow: rgba(37, 99, 235, 0.12);
+    --risk-critical: #e11d48;
+    --risk-high: #ea580c;
+    --risk-medium: #d97706;
+    --risk-low: #059669;
     --success: #10b981;
-    --card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --card-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.04);
+    --card-shadow-hover: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
   }
 
   .dark {
-    --bg-primary: #0a0f1a;
-    --bg-secondary: #111827;
+    --bg-primary: #090d16;
+    --bg-secondary: #0f172a;
     --bg-tertiary: #1e293b;
-    --bg-card: #151d2e;
-    --text-primary: #f1f5f9;
+    --bg-card: #111a2e;
+    --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
     --border-default: #1e293b;
-    --border-subtle: #1e293b;
-    --accent: #59b1ff;
-    --accent-glow: rgba(89, 177, 255, 0.12);
-    --risk-critical: #f87171;
+    --border-subtle: #172033;
+    --accent: #3b82f6;
+    --accent-glow: rgba(59, 130, 246, 0.15);
+    --risk-critical: #fb7185;
     --risk-high: #fb923c;
-    --risk-medium: #facc15;
-    --risk-low: #4ade80;
+    --risk-medium: #fbbf24;
+    --risk-low: #34d399;
     --success: #34d399;
-    --card-shadow: 0 1px 3px rgba(0,0,0,0.25), 0 4px 16px rgba(0,0,0,0.2);
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+    --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
   }
 
   body {
     @apply font-sans antialiased;
     background: var(--bg-primary);
     color: var(--text-primary);
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 }
 
 @layer components {
+  /* Institutional Glassmorphism Cards */
   .glass-card {
     background: var(--bg-card);
     border: 1px solid var(--border-default);
     box-shadow: var(--card-shadow);
-    @apply rounded-xl;
+    @apply rounded-xl transition-all duration-200;
+  }
+
+  .glass-card-hover {
+    @apply glass-card;
+  }
+  .glass-card-hover:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
+    border-color: rgba(59, 130, 246, 0.35);
   }
 
   .kpi-card {
@@ -72,26 +84,44 @@
   }
 
   .btn-primary {
-    @apply px-5 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200;
+    @apply px-5 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 inline-flex items-center justify-center gap-2;
     background: var(--accent);
     color: white;
   }
   .btn-primary:hover {
     filter: brightness(1.1);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px var(--accent-glow);
+    box-shadow: 0 4px 14px var(--accent-glow);
   }
 
-  .btn-scenario {
-    @apply glass-card px-4 py-3 text-sm font-medium cursor-pointer transition-all duration-200 text-left;
+  /* Stripe/Linear-style Scenario Button Card */
+  .btn-scenario-card {
+    @apply glass-card p-4 text-left cursor-pointer transition-all duration-200 relative overflow-hidden flex flex-col justify-between;
   }
-  .btn-scenario:hover {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 1px var(--accent), 0 4px 12px var(--accent-glow);
+  .btn-scenario-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow-hover);
+    border-color: rgba(59, 130, 246, 0.4);
   }
-  .btn-scenario.active {
+  .btn-scenario-card.active {
     border-color: var(--accent);
-    background: var(--accent-glow);
+    box-shadow: 0 0 0 2px var(--accent), 0 8px 20px var(--accent-glow);
+    background: linear-gradient(135deg, var(--bg-card) 0%, var(--accent-glow) 100%);
+  }
+
+  /* Badges */
+  .badge-tp {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase border;
+    background: rgba(225, 29, 72, 0.08);
+    color: #f43f5e;
+    border-color: rgba(225, 29, 72, 0.25);
+  }
+
+  .badge-fpc {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase border;
+    background: rgba(16, 185, 129, 0.08);
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.25);
   }
 
   .risk-badge {
@@ -99,10 +129,10 @@
   }
 
   .shap-bar-positive {
-    @apply bg-red-500/80;
+    @apply bg-rose-500/85;
   }
   .shap-bar-negative {
-    @apply bg-emerald-500/80;
+    @apply bg-emerald-500/85;
   }
 
   .toggle-track {
@@ -113,7 +143,7 @@
   }
 
   .pulse-dot {
-    @apply w-2.5 h-2.5 rounded-full;
+    @apply w-2 h-2 rounded-full;
     animation: pulse-glow 2s ease-in-out infinite;
   }
 
@@ -123,7 +153,7 @@
   }
 
   .slide-in {
-    animation: slideIn 0.3s ease-out forwards;
+    animation: slideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   @keyframes slideIn {
@@ -131,11 +161,24 @@
     to { transform: translateX(0); opacity: 1; }
   }
 
-  /* Cytoscape graph styling overrides */
+  /* Dot Grid Canvas Pattern */
+  .graph-canvas-wrapper {
+    @apply relative w-full rounded-xl overflow-hidden border;
+    border-color: var(--border-default);
+    background-color: var(--bg-secondary);
+  }
+
+  .dot-grid-bg {
+    background-image: radial-gradient(rgba(148, 163, 184, 0.25) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  .dark .dot-grid-bg {
+    background-image: radial-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
   .cytoscape-container {
-    @apply w-full rounded-xl overflow-hidden;
-    height: 480px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-default);
+    @apply w-full;
+    height: 520px;
   }
 }

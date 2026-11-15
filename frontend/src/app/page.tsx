@@ -108,7 +108,11 @@ export default function DashboardPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 py-6 space-y-6">
+      <main
+        className={`flex-1 max-w-[1440px] mx-auto w-full px-6 py-6 space-y-6 transition-all duration-300 ${
+          drawerOpen ? "xl:pr-[420px]" : ""
+        }`}
+      >
         {/* KPI Cards */}
         <KPICards />
 
@@ -136,7 +140,7 @@ export default function DashboardPage() {
 
         {/* Graph Canvas */}
         {result && (
-          <div className={`transition-all duration-300 ${drawerOpen ? "mr-[410px]" : ""}`}>
+          <div className="w-full">
             <GraphCanvas
               nodes={result.graphNodes}
               edges={result.graphEdges}
