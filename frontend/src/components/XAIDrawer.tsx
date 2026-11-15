@@ -122,7 +122,8 @@ function ROICalculator({ roi }: { roi: ROIMetrics }) {
   const [hourlyRate, setHourlyRate] = useState(50);
   const fpSavedPerMillion = 87_571; // from pipeline benchmarks
   const hoursSavedPerMillion = fpSavedPerMillion * 0.5;
-  const annualSavings = hoursSavedPerMillion * hourlyRate;
+  // Figures are normalized per 1M transactions screened, not per year.
+  const savingsPerMillion = hoursSavedPerMillion * hourlyRate;
 
   return (
     <div className="space-y-3">
@@ -141,6 +142,7 @@ function ROICalculator({ roi }: { roi: ROIMetrics }) {
         step={5}
         value={hourlyRate}
         onChange={(e) => setHourlyRate(Number(e.target.value))}
+        aria-label="Analyst hourly rate in US dollars"
         className="w-full h-1.5 rounded-lg cursor-pointer accent-blue-500"
         style={{ background: "var(--bg-tertiary)" }}
       />
@@ -165,9 +167,9 @@ function ROICalculator({ roi }: { roi: ROIMetrics }) {
           className="flex justify-between text-sm font-bold pt-2 border-t"
           style={{ borderColor: "var(--border-default)" }}
         >
-          <span style={{ color: "var(--text-primary)" }}>Annual Savings</span>
+          <span style={{ color: "var(--text-primary)" }}>Savings / 1M Txns</span>
           <span className="font-mono font-bold tabular-nums" style={{ color: "var(--success)" }}>
-            ${annualSavings.toLocaleString()}
+            ${savingsPerMillion.toLocaleString("en-US")}
           </span>
         </div>
       </div>
@@ -203,7 +205,9 @@ export default function XAIDrawer({
 
   return (
     <div
-      className="fixed top-16 right-0 bottom-0 w-[400px] z-40 slide-in overflow-y-auto border-l"
+      role="complementary"
+      aria-label="XAI analysis and ROI"
+      className="fixed top-16 right-0 bottom-0 w-full sm:w-[400px] z-40 slide-in overflow-y-auto border-l"
       style={{
         background: "var(--bg-primary)",
         borderColor: "var(--border-default)",
@@ -222,6 +226,7 @@ export default function XAIDrawer({
         </span>
         <button
           onClick={onClose}
+          aria-label="Close analysis panel"
           className="w-7 h-7 rounded-md flex items-center justify-center"
           style={{
             background: "var(--bg-tertiary)",

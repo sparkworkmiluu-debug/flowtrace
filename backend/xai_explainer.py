@@ -136,7 +136,9 @@ class FlowTraceExplainer:
     """Manages XGBoost model inference, Tree-SHAP computation, and Gemini risk narratives."""
 
     def __init__(self, model_path: Optional[str] = None):
-        self.model_path = model_path or "backend/model.json"
+        # Resolve relative to this file so the model loads regardless of the
+        # working directory uvicorn was started from.
+        self.model_path = model_path or str(Path(__file__).resolve().parent / "model.json")
         self.model: Optional[xgb.Booster] = None
         self.explainer: Optional[shap.TreeExplainer] = None
         self._load_model()
@@ -370,13 +372,19 @@ Return strictly valid JSON conforming to the requested schema. Never output mark
             except Exception:
                 return None
 
-        # Try API with timeout fallback
+        # Try API with a hard wall-clock timeout. Each model attempt has its own
+        # HTTP timeout, so without this the endpoint could block for several
+        # seconds while falling through the model list.
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
         try:
-            res = _call_gemini_api()
+            res = executor.submit(_call_gemini_api).result(timeout=timeout_seconds)
             if res is not None:
                 return res
         except Exception:
             pass
+        finally:
+            # Don't wait for a slow call that already timed out.
+            executor.shutdown(wait=False)
 
         return self.generate_deterministic_narrative(
             masked_entity, risk_score, top_contributions, motifs

@@ -1,19 +1,19 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useCallback, useState } from "react";
 import type { GraphNode, GraphEdge } from "@/lib/types";
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ─────────────────────────────────────────────────────────────────────────
  * Upgraded Interactive Graph Canvas (Cytoscape.js)
  *
  * Features:
  * - Subtle dot-grid canvas background with dark/light mode support.
  * - Directional arrows with currency-formatted `$` amount labels on edges.
  * - Subtle glow & border highlights on hub and origin entities.
- * - Floating Zoom In (+), Zoom Out (-), Fit Graph (â›¶), and Reset (âŸ²) controls.
+ * - Floating Zoom In (+), Zoom Out (-), Fit Graph (⛶), and Reset (⟲) controls.
  * - Prominent Legacy Rules vs. FlowTrace Graph toggle with dynamic alert badges.
  * - Node inspection card displaying PageRank & connected metrics.
- * â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+ * ───────────────────────────────────────────────────────────────────── */
 
 interface Props {
   nodes: GraphNode[];
@@ -110,10 +110,21 @@ export default function GraphCanvas({
   const [showBaseline, setShowBaseline] = useState(false);
   const [selectedNodeDetails, setSelectedNodeDetails] = useState<NodeDetails | null>(null);
 
-  const initCytoscape = useCallback(async () => {
+  // Keep the latest click handler in a ref so a new callback identity from the
+  // parent doesn't tear down and re-layout the whole graph on every render.
+  const onNodeClickRef = useRef(onNodeClick);
+  useEffect(() => {
+    onNodeClickRef.current = onNodeClick;
+  }, [onNodeClick]);
+
+  const initCytoscape = useCallback(async (isCancelled: () => boolean) => {
     if (!containerRef.current || nodes.length === 0) return;
 
     const cytoscape = (await import("cytoscape")).default;
+    // The component may have unmounted (or data changed) while the module loaded.
+    if (isCancelled() || !containerRef.current) return;
+
+    setSelectedNodeDetails(null);
 
     const isDark = document.documentElement.classList.contains("dark");
     const textColor = isDark ? "#f1f5f9" : "#0f172a";
@@ -274,7 +285,7 @@ export default function GraphCanvas({
         });
       }
 
-      onNodeClick?.(id);
+      onNodeClickRef.current?.(id);
     });
 
     // Canvas click to deselect
@@ -285,12 +296,17 @@ export default function GraphCanvas({
     });
 
     cyRef.current = cy;
-  }, [nodes, edges, riskScore, onNodeClick]);
+  }, [nodes, edges, riskScore]);
 
   useEffect(() => {
-    initCytoscape();
+    let cancelled = false;
+    initCytoscape(() => cancelled);
     return () => {
-      if (cyRef.current) cyRef.current.destroy();
+      cancelled = true;
+      if (cyRef.current) {
+        cyRef.current.destroy();
+        cyRef.current = null;
+      }
     };
   }, [initCytoscape]);
 
@@ -344,7 +360,7 @@ export default function GraphCanvas({
               color: "var(--text-secondary)",
             }}
           >
-            {nodes.length} Nodes â€¢ {edges.length} Edges
+            {nodes.length} Nodes • {edges.length} Edges
           </span>
         </div>
 
@@ -405,10 +421,10 @@ export default function GraphCanvas({
         }}
       >
         <div className="flex items-center gap-2">
-          <span>{isAlert ? "ðŸš¨" : "ðŸ›¡ï¸"}</span>
+          <span>{isAlert ? "🚨" : "🛡️"}</span>
           <span>
             {showBaseline ? "Legacy 3-Rule Engine" : "FlowTrace Graph Model"}
-            {" â€” "}
+            {" — "}
             <strong>
               {isAlert
                 ? "AML ALERT TRIGGERED (SAR Escalation Required)"
@@ -446,7 +462,7 @@ export default function GraphCanvas({
             className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold transition-colors hover:bg-blue-500/10 hover:text-blue-500"
             style={{ color: "var(--text-secondary)" }}
           >
-            âˆ’
+            −
           </button>
           <div className="h-px w-full" style={{ background: "var(--border-default)" }} />
           <button
@@ -495,7 +511,7 @@ export default function GraphCanvas({
                 className="text-xs px-1.5 py-0.5 rounded opacity-60 hover:opacity-100"
                 style={{ color: "var(--text-muted)" }}
               >
-                âœ•
+                ✕
               </button>
             </div>
 

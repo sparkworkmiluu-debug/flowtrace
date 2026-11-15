@@ -6,3 +6,9 @@ node_modules/
 
 .next/
 
+
+# Local environments & build caches
+.venv/
+venv/
+*.tsbuildinfo
+.pytest_cache/

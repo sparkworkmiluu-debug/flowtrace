@@ -222,3 +222,57 @@ def test_rate_limiting_10_req_per_minute(client: TestClient):
     # 11th and 12th should be blocked by rate limiter (HTTP 429)
     assert statuses[10] == 429
     assert statuses[11] == 429
+
+
+def _fake_request(peer: str, forwarded: str | None = None):
+    from starlette.requests import Request
+
+    headers = [(b"x-forwarded-for", forwarded.encode())] if forwarded else []
+    return Request({"type": "http", "client": (peer, 1234), "headers": headers})
+
+
+def test_rate_limit_key_separates_users_behind_local_proxy():
+    """Behind the Next.js rewrite proxy (loopback peer), each end user gets their own bucket."""
+    from backend.main import client_ip_key
+
+    assert client_ip_key(_fake_request("127.0.0.1", "203.0.113.7, 10.0.0.1")) == "203.0.113.7"
+    assert client_ip_key(_fake_request("127.0.0.1", "198.51.100.2")) == "198.51.100.2"
+    # No forwarded header: fall back to the peer address.
+    assert client_ip_key(_fake_request("127.0.0.1")) == "127.0.0.1"
+
+
+def test_rate_limit_key_ignores_spoofed_forwarded_header():
+    """A direct (non-proxy) client cannot dodge the limit by forging X-Forwarded-For."""
+    from backend.main import client_ip_key
+
+    assert client_ip_key(_fake_request("203.0.113.50", "1.2.3.4")) == "203.0.113.50"
+
+
+def test_long_transaction_chain_does_not_overflow_recursion(client: TestClient):
+    """A 1,500-hop chain must not crash cycle detection with RecursionError (HTTP 500)."""
+    chain = [
+        {"source": f"node_{i:05d}", "target": f"node_{i + 1:05d}", "amount": 10.0}
+        for i in range(1500)
+    ]
+    res = client.post("/api/analyze", json={"entity_id": "node_00000", "transactions": chain})
+    assert res.status_code == 200
+
+
+def test_cycle_detection_on_ring(client: TestClient):
+    """A closed 3-hop ring is still detected after the iterative DFS rewrite."""
+    from backend.main import _graph_has_cycle
+
+    assert _graph_has_cycle({"a": ["b"], "b": ["c"], "c": ["a"]}) is True
+    assert _graph_has_cycle({"a": ["b", "c"], "b": ["c"], "c": []}) is False
+
+
+def test_transaction_payload_size_is_capped(client: TestClient):
+    """Oversized subgraphs are rejected with 422 instead of being processed."""
+    from backend.main import MAX_TRANSACTIONS
+
+    too_many = [
+        {"source": "src_000", "target": f"dst_{i:05d}", "amount": 1.0}
+        for i in range(MAX_TRANSACTIONS + 1)
+    ]
+    res = client.post("/api/analyze", json={"entity_id": "src_000", "transactions": too_many})
+    assert res.status_code == 422

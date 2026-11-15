@@ -58,7 +58,15 @@ export default function DashboardPage() {
     (scenarioId: string) => {
       setError(null);
       const s = scenarios.find((sc) => sc.id === scenarioId);
-      if (!s) return;
+      if (!s) {
+        // Cards are always rendered, but their data comes from the API.
+        setError(
+          scenarios.length === 0
+            ? "Demo scenarios are unavailable — the FlowTrace API appears to be offline. Start the backend and reload."
+            : `Scenario "${scenarioId}" was not found in the API response.`
+        );
+        return;
+      }
 
       setActiveScenario(scenarioId);
       setResult({
@@ -99,12 +107,15 @@ export default function DashboardPage() {
         executionTime: res.execution_time_ms,
       });
       setDrawerOpen(true);
-    } catch (err: any) {
-      setError(err.message || "Analysis failed");
+    } catch (err: unknown) {
+      setError(err instanceof Error && err.message ? err.message : "Analysis failed");
     } finally {
       setIsLoading(false);
     }
   }, []);
+
+  // Stable identity so GraphCanvas doesn't rebuild the graph on every render.
+  const handleNodeClick = useCallback(() => setDrawerOpen(true), []);
 
   // Reset to Hero Command Bar mode
   const handleReset = useCallback(() => {
@@ -127,19 +138,22 @@ export default function DashboardPage() {
         <KPICards />
 
         {/* Gemini-Style Command Bar: Hero Mode (!result) vs Compact Workspace (result) */}
-        <DemoSelector
-          activeScenario={activeScenario}
-          onSelectScenario={handleSelectScenario}
-          onAnalyze={handleAnalyze}
-          isLoading={isLoading}
-          hasResult={Boolean(result)}
-          onReset={handleReset}
-        />
+        <section id="demo" className="scroll-mt-20">
+          <DemoSelector
+            activeScenario={activeScenario}
+            onSelectScenario={handleSelectScenario}
+            onAnalyze={handleAnalyze}
+            isLoading={isLoading}
+            hasResult={Boolean(result)}
+            onReset={handleReset}
+          />
+        </section>
 
         {/* Error Notification Banner */}
         {error && (
           <div
-            className="px-4 py-3 rounded-xl text-sm border flex items-center justify-between"
+            role="alert"
+            className="px-4 py-3 rounded-xl text-sm border flex items-center justify-between gap-3"
             style={{
               background: "rgba(239,68,68,0.08)",
               color: "var(--risk-critical)",
@@ -165,9 +179,7 @@ export default function DashboardPage() {
               baselineAlert={result.baselineAlert}
               flowtraceAlert={result.flowtraceAlert}
               riskScore={result.riskScore}
-              onNodeClick={() => {
-                setDrawerOpen(true);
-              }}
+              onNodeClick={handleNodeClick}
             />
           </div>
         )}
