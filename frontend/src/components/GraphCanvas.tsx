@@ -1,19 +1,19 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useCallback, useState } from "react";
 import type { GraphNode, GraphEdge } from "@/lib/types";
 
-/* ─────────────────────────────────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
  * Upgraded Interactive Graph Canvas (Cytoscape.js)
  *
  * Features:
  * - Subtle dot-grid canvas background with dark/light mode support.
  * - Directional arrows with currency-formatted `$` amount labels on edges.
  * - Subtle glow & border highlights on hub and origin entities.
- * - Floating Zoom In (+), Zoom Out (-), Fit Graph (⛶), and Reset (⟲) controls.
+ * - Floating Zoom In (+), Zoom Out (-), Fit Graph (â›¶), and Reset (âŸ²) controls.
  * - Prominent Legacy Rules vs. FlowTrace Graph toggle with dynamic alert badges.
  * - Node inspection card displaying PageRank & connected metrics.
- * ───────────────────────────────────────────────────────────────────── */
+ * â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 interface Props {
   nodes: GraphNode[];
@@ -197,13 +197,11 @@ export default function GraphCanvas({
           style: {
             "border-width": 4.5,
             "border-color": "#3b82f6",
+            "border-opacity": 1,
             "background-color": "#2563eb",
             width: 46,
             height: 46,
-            "shadow-blur": 20,
-            "shadow-color": "rgba(59, 130, 246, 0.7)",
-            "shadow-opacity": 0.8,
-          },
+          } as any,
         },
         {
           selector: "edge",
@@ -346,7 +344,7 @@ export default function GraphCanvas({
               color: "var(--text-secondary)",
             }}
           >
-            {nodes.length} Nodes • {edges.length} Edges
+            {nodes.length} Nodes â€¢ {edges.length} Edges
           </span>
         </div>
 
@@ -407,10 +405,10 @@ export default function GraphCanvas({
         }}
       >
         <div className="flex items-center gap-2">
-          <span>{isAlert ? "🚨" : "🛡️"}</span>
+          <span>{isAlert ? "ðŸš¨" : "ðŸ›¡ï¸"}</span>
           <span>
             {showBaseline ? "Legacy 3-Rule Engine" : "FlowTrace Graph Model"}
-            {" — "}
+            {" â€” "}
             <strong>
               {isAlert
                 ? "AML ALERT TRIGGERED (SAR Escalation Required)"
@@ -448,7 +446,7 @@ export default function GraphCanvas({
             className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold transition-colors hover:bg-blue-500/10 hover:text-blue-500"
             style={{ color: "var(--text-secondary)" }}
           >
-            −
+            âˆ’
           </button>
           <div className="h-px w-full" style={{ background: "var(--border-default)" }} />
           <button
@@ -497,7 +495,7 @@ export default function GraphCanvas({
                 className="text-xs px-1.5 py-0.5 rounded opacity-60 hover:opacity-100"
                 style={{ color: "var(--text-muted)" }}
               >
-                ✕
+                âœ•
               </button>
             </div>
 
